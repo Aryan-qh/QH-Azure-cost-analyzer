@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Cost Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☁️ Azure Cost Analyzer</h1>
+            <p class="subtitle">Monitor and analyze your Azure costs with intelligent anomaly detection</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab active" data-tab="anomaly">Anomaly Detection</button>
+            <button class="tab" data-tab="report">Cost Report</button>
+        </nav>
+
+        <!-- Anomaly Detection Tab -->
+        <div id="anomaly-tab" class="tab-content active">
+            <div class="card">
+                <h2>🔍 Anomaly Detection</h2>
+                <p class="card-subtitle">Compare costs against 7-day averages to detect unusual spending patterns</p>
+                
+                <form id="anomaly-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="target-date">Target Date</label>
+                            <input type="date" id="target-date" name="target-date" required>
+                            <small>Leave empty for yesterday</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="threshold">Threshold (%)</label>
+                            <input type="number" id="threshold" name="threshold" value="25" min="0" max="100" step="1">
+                            <small>Alert if cost exceeds this % above average</small>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Detect Anomalies</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="anomaly-results" style="display: none;">
+                <div class="card">
+                    <div class="summary-header">
+                        <h3>Detection Summary</h3>
+                        <div id="summary-badge"></div>
+                    </div>
+                    <div id="summary-content"></div>
+                </div>
+
+                <div id="subscription-results"></div>
+            </div>
+        </div>
+
+        <!-- Cost Report Tab -->
+        <div id="report-tab" class="tab-content">
+            <div class="card">
+                <h2>📊 Generate Cost Report</h2>
+                <p class="card-subtitle">Create a comprehensive Word document with cost analysis</p>
+                
+                <form id="report-form">
+                    <div class="form-group">
+                        <label for="num-days">Number of Days</label>
+                        <input type="number" id="num-days" name="num-days" value="7" min="1" max="90" required>
+                        <small>Generate report for the last N days (ending yesterday)</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Generate Report</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <div id="report-result" style="display: none;">
+                    <div class="success-message">
+                        <div class="success-icon">✓</div>
+                        <h3>Report Generated Successfully!</h3>
+                        <p id="report-message"></p>
+                        <a id="download-link" href="#" class="btn btn-success" download>
+                            📥 Download Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
