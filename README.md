@@ -1,5 +1,7 @@
 # Azure Cost Analyzer
 
+![Demo](assets/demo.gif)
+
 A modern web application for monitoring Azure costs with intelligent anomaly detection and automated reporting.
 
 ## Features
