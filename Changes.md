@@ -3,7 +3,7 @@
 This document outlines the latest updates made to the Azure Cost Analyzer project. 
 
 
-## ✅ **What’s Changed**
+## **What’s Changed**
 
 ### **1. Resource Type → Service Name**
 
