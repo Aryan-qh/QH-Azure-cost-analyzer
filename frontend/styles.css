@@ -336,11 +336,32 @@ th {
     color: #991b1b;
 }
 
+/* 
+ * CHANGE #1: Updated color logic for percentage changes
+ * 
+ * Previous Logic:
+ * - All positive changes (including 0%) were shown in red
+ * - All negative changes were shown in green
+ * 
+ * New Logic:
+ * - 0% changes are now shown in green (neutral/good)
+ * - Positive changes (> 0%) are shown in red (cost increase)
+ * - Negative changes (< 0%) are shown in green (cost decrease)
+ * 
+ * Implementation:
+ * - We'll apply the color class in JavaScript based on the exact value
+ * - The CSS classes remain the same for backwards compatibility
+ */
 .change-positive {
     color: var(--danger);
 }
 
 .change-negative {
+    color: var(--success);
+}
+
+/* New class for zero/neutral changes */
+.change-neutral {
     color: var(--success);
 }
 
