@@ -3,96 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure Cost Analyzer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Cloud Cost Analyzer</title>
+    
+    <!-- Modular CSS imports -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/tabs.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>☁️ Azure Cost Analyzer</h1>
-            <p class="subtitle">Monitor and analyze your Azure costs with intelligent anomaly detection</p>
+            <h1>Cloud Cost Analyzer</h1>
+            <p class="subtitle">Enterprise Cloud Cost Management Platform</p>
         </header>
 
         <nav class="tabs">
-            <button class="tab active" data-tab="anomaly">Anomaly Detection</button>
-            <button class="tab" data-tab="report">Cost Report</button>
+            <button class="tab active" data-tab="config">Configuration</button>
+            <button class="tab disabled" data-tab="anomaly" id="anomaly-tab-btn">
+                Anomaly Detection
+                <span class="tab-tooltip">Please configure your credentials first</span>
+            </button>
+            <button class="tab disabled" data-tab="report" id="report-tab-btn">
+                Cost Report
+                <span class="tab-tooltip">Please configure your credentials first</span>
+            </button>
         </nav>
 
-        <!-- Anomaly Detection Tab -->
-        <div id="anomaly-tab" class="tab-content active">
+        <div id="config-tab" class="tab-content active">
             <div class="card">
-                <h2>🔍 Anomaly Detection</h2>
-                <p class="card-subtitle">Compare costs against 7-day averages to detect unusual spending patterns</p>
-                
-                <form id="anomaly-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="target-date">Target Date</label>
-                            <input type="date" id="target-date" name="target-date" required>
-                            <small>Leave empty for yesterday</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="threshold">Threshold (%)</label>
-                            <input type="number" id="threshold" name="threshold" value="25" min="0" max="100" step="1">
-                            <small>Alert if cost exceeds this % above average</small>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Detect Anomalies</span>
-                        <span class="spinner" style="display: none;"></span>
-                    </button>
-                </form>
-            </div>
-
-            <div id="anomaly-results" style="display: none;">
-                <div class="card">
-                    <div class="summary-header">
-                        <h3>Detection Summary</h3>
-                        <div id="summary-badge"></div>
-                    </div>
-                    <div id="summary-content"></div>
+                <div style="padding: 2rem; border-bottom: 1px solid var(--border);">
+                    <h2>Configuration</h2>
+                    <p class="card-subtitle">Configure your cloud provider credentials and subscriptions</p>
                 </div>
 
-                <div id="subscription-results"></div>
+                <div style="padding: 2rem;">
+                    <div class="config-section">
+                        <h3>Cloud Provider</h3>
+                        <div class="provider-selection">
+                            <label class="provider-card selected" data-provider="azure">
+                                <input type="radio" name="cloud_provider" value="azure" checked>
+                                <div class="provider-icon"></div>
+                                <div class="provider-name">Microsoft Azure</div>
+                                <div class="provider-status">Available</div>
+                            </label>
+                            <label class="provider-card disabled" data-provider="gcp">
+                                <input type="radio" name="cloud_provider" value="gcp" disabled>
+                                <div class="provider-icon"></div>
+                                <div class="provider-name">Google Cloud</div>
+                                <div class="provider-status">Coming Soon</div>
+                            </label>
+                            <label class="provider-card disabled" data-provider="aws">
+                                <input type="radio" name="cloud_provider" value="aws" disabled>
+                                <div class="provider-icon"></div>
+                                <div class="provider-name">Amazon AWS</div>
+                                <div class="provider-status">Coming Soon</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="azure-credentials-section" class="config-section">
+                        <h3>Azure Credentials</h3>
+                        <p class="helper-text">Enter your Azure Active Directory credentials to access the Cost Management API</p>
+
+                        <div class="credential-group">
+                            <label for="tenant-id">Tenant ID</label>
+                            <div class="credential-input-wrapper">
+                                <input type="password" id="tenant-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                                <button type="button" class="toggle-visibility" data-target="tenant-id">
+                                    <span class="eye-icon">SHOW</span>
+                                </button>
+                            </div>
+                            <small>Your Azure AD Directory (tenant) ID in GUID format</small>
+                        </div>
+
+                        <div class="credential-group">
+                            <label for="client-id">Client ID</label>
+                            <div class="credential-input-wrapper">
+                                <input type="password" id="client-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                                <button type="button" class="toggle-visibility" data-target="client-id">
+                                    <span class="eye-icon">SHOW</span>
+                                </button>
+                            </div>
+                            <small>Your Azure AD Application (client) ID</small>
+                        </div>
+
+                        <div class="credential-group">
+                            <label for="client-secret">Client Secret</label>
+                            <div class="credential-input-wrapper">
+                                <input type="password" id="client-secret" placeholder="Enter your client secret" required>
+                                <button type="button" class="toggle-visibility" data-target="client-secret">
+                                    <span class="eye-icon">SHOW</span>
+                                </button>
+                            </div>
+                            <small>Your Azure AD Application client secret value</small>
+                        </div>
+
+                        <button type="button" id="test-connection-btn" class="btn btn-secondary">
+                            <span class="btn-text">Test Connection</span>
+                            <span class="spinner" style="display: none;"></span>
+                        </button>
+                        <div id="test-result" style="display: none;"></div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Subscriptions</h3>
+                        <p class="helper-text">Configure the Azure subscriptions you want to monitor</p>
+
+                        <div class="form-group">
+                            <label for="subscription-count">Number of Subscriptions</label>
+                            <input type="number" id="subscription-count" min="1" max="20" value="1">
+                            <small>How many Azure subscriptions do you want to monitor? (1-20)</small>
+                        </div>
+
+                        <div id="subscription-list"></div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" id="save-config-btn" class="btn btn-primary" disabled>
+                            <span class="btn-text">Save Configuration</span>
+                            <span class="spinner" style="display: none;"></span>
+                        </button>
+                        <button type="button" id="clear-config-btn" class="btn btn-secondary">
+                            <span class="btn-text">Clear Configuration</span>
+                        </button>
+                    </div>
+
+                    <div id="config-status" class="config-status not-configured" style="display: none;">
+                        <div class="config-status-text">Configuration Status</div>
+                        <div id="config-status-details"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Cost Report Tab -->
+        <div id="anomaly-tab" class="tab-content">
+            <div class="card">
+                <div style="padding: 2rem; border-bottom: 1px solid var(--border);">
+                    <h2>Anomaly Detection</h2>
+                    <p class="card-subtitle">Compare costs against rolling calendar averages to detect unusual spending patterns</p>
+                </div>
+                
+                <div style="padding: 2rem;">
+                    <form id="anomaly-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="target-date">Target Date</label>
+                                <input type="date" id="target-date" name="target-date" required>
+                                <small>Leave empty for yesterday</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="threshold">Threshold (%)</label>
+                                <input type="number" id="threshold" name="threshold" value="25" min="0" max="100" step="1">
+                                <small>Alert if cost exceeds this % above average</small>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">Detect Anomalies</span>
+                            <span class="spinner" style="display: none;"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="anomaly-results" style="display: none;"></div>
+        </div>
+
         <div id="report-tab" class="tab-content">
             <div class="card">
-                <h2>📊 Generate Cost Report</h2>
-                <p class="card-subtitle">Create a comprehensive Word document with cost analysis</p>
+                <div style="padding: 2rem; border-bottom: 1px solid var(--border);">
+                    <h2>Generate Cost Report</h2>
+                    <p class="card-subtitle">Create a comprehensive Word document with cost analysis</p>
+                </div>
                 
-                <form id="report-form">
-                    <div class="form-group">
-                        <label for="num-days">Number of Days</label>
-                        <input type="number" id="num-days" name="num-days" value="7" min="1" max="90" required>
-                        <small>Generate report for the last N days (ending yesterday)</small>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Generate Report</span>
-                        <span class="spinner" style="display: none;"></span>
-                    </button>
-                </form>
+                <div style="padding: 2rem;">
+                    <form id="report-form">
+                        <div class="form-group">
+                            <label for="num-days">Number of Days</label>
+                            <input type="number" id="num-days" name="num-days" value="7" min="1" max="90" required>
+                            <small>Generate report for the last N days (ending yesterday)</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">Generate Report</span>
+                            <span class="spinner" style="display: none;"></span>
+                        </button>
+                    </form>
 
-                <div id="report-result" style="display: none;">
-                    <div class="success-message">
-                        <div class="success-icon">✓</div>
-                        <h3>Report Generated Successfully!</h3>
-                        <p id="report-message"></p>
-                        <a id="download-link" href="#" class="btn btn-success" download>
-                            📥 Download Report
-                        </a>
+                    <div id="report-result" style="display: none;">
+                        <div class="success-message">
+                            <div class="success-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
+                            </div>
+                            <h3>Report Generated Successfully</h3>
+                            <p id="report-message"></p>
+                            <a id="download-link" href="#" class="btn btn-success" download>
+                                Download Report
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Modular JavaScript imports (ES6 modules) -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

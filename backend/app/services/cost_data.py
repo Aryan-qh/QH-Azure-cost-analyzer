@@ -4,7 +4,7 @@ Azure Cost Data Fetching Service
 import requests
 import time
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 
 
 class CostDataService:
@@ -43,7 +43,7 @@ class CostDataService:
                 'grouping': [
                     {
                         'type': 'Dimension',
-                        'name': 'ResourceType'
+                        'name': 'ServiceName'
                     }
                 ]
             }
@@ -57,11 +57,15 @@ class CostDataService:
                 timeout=30
             )
             
-            # Handle rate limiting
+            # Handle rate limiting with proper retry logic
             if response.status_code == 429:
                 if retry_count < max_retries:
-                    retry_after = int(response.headers.get('Retry-After', 2 ** retry_count))
-                    print(f"Rate limit hit. Waiting {retry_after} seconds...")
+                    # Respect Retry-After header, with a max cap of 60 seconds
+                    retry_after = min(
+                        int(response.headers.get('Retry-After', 2 ** retry_count)),
+                        60
+                    )
+                    print(f"Rate limit hit. Waiting {retry_after} seconds... (Retry {retry_count + 1}/{max_retries})")
                     time.sleep(retry_after)
                     return self.get_cost_data_range(
                         subscription_id, start_date, end_date, retry_count + 1, max_retries
@@ -70,25 +74,66 @@ class CostDataService:
                     raise Exception("Max retries reached due to rate limiting")
             
             response.raise_for_status()
-            return response.json()['properties']
+            properties = response.json()['properties']
+            
+            return properties
             
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error fetching cost data: {str(e)}")
     
+    def _get_column_indices(self, columns: list) -> Tuple[int, int, int, int]:
+        """Get column indices dynamically from API response"""
+        
+        indices = {}
+        for idx, col in enumerate(columns):
+            indices[col['name']] = idx
+        
+        # Validate required columns exist
+        required_cols = ['UsageDate', 'ServiceName', 'Cost']
+        for col in required_cols:
+            if col not in indices:
+                raise ValueError(f"Missing required column: {col}")
+        
+        return (
+            indices['Cost'],
+            indices['UsageDate'],
+            indices['ServiceName'],
+            indices.get('Currency', -1)  # Currency might not always be present
+        )
+    
     def parse_range_response(self, response_data: Dict[str, Any]) -> Dict[int, list]:
-        """Parse the range API response and organize by date"""
+        """
+        Parse the range API response and organize by date.
+        Returns normalized data structure: Dict[date_key, List[normalized_rows]]
+        Each normalized_row: [cost, date, service_name, currency]
+        """
         
         if not response_data or 'rows' not in response_data:
             return {}
         
         columns = response_data.get('columns', [])
-        date_idx = next((i for i, col in enumerate(columns) if col['name'] == 'UsageDate'), 1)
+        
+        # Get column indices dynamically
+        cost_idx, date_idx, service_idx, currency_idx = self._get_column_indices(columns)
+        
+        print(f"DEBUG: Column mapping - cost_idx={cost_idx}, date_idx={date_idx}, "
+              f"service_idx={service_idx}, currency_idx={currency_idx}")
         
         daily_data = {}
+        
         for row in response_data['rows']:
+            # Extract values using correct indices
             date = row[date_idx]
+            cost = float(row[cost_idx])
+            service_name = row[service_idx]
+            currency = row[currency_idx] if currency_idx >= 0 and len(row) > currency_idx else 'USD'
+            
+            # Create normalized row structure
+            # [0: Cost, 1: Date, 2: ServiceName, 3: Currency]
+            normalized_row = [cost, date, service_name, currency]
+            
             if date not in daily_data:
                 daily_data[date] = []
-            daily_data[date].append(row)
+            daily_data[date].append(normalized_row)
         
         return daily_data

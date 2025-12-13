@@ -1,0 +1,442 @@
+/* ============================================================================
+   CARDS
+   ============================================================================ */
+
+.card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--spacing-md);
+    overflow: hidden;
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing) 0;
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-dark);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--text-tertiary);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.button-group {
+    display: flex;
+    gap: var(--spacing);
+    margin-top: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ============================================================================
+   FORMS
+   ============================================================================ */
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    background: var(--bg-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.form-group small {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================================================
+   BADGES
+   ============================================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.875rem;
+    gap: var(--spacing-xs);
+    position: relative;
+}
+
+.badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.badge-success {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.badge-success::before {
+    background: var(--success);
+}
+
+.badge-danger {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+}
+
+.badge-danger::before {
+    background: var(--danger);
+}
+
+.badge-warning {
+    background: var(--warning-light);
+    color: var(--warning-dark);
+}
+
+.badge-warning::before {
+    background: var(--warning);
+}
+
+/* ============================================================================
+   NOTIFICATIONS & ALERTS
+   ============================================================================ */
+
+.test-success,
+.test-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-top: var(--spacing);
+    font-size: 0.95rem;
+    animation: slideDown 0.3s ease;
+}
+
+.test-success {
+    background: var(--success-light);
+    color: var(--success-dark);
+    border: 1px solid #d1fae5;
+}
+
+.test-error {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+    border: 1px solid #fecaca;
+}
+
+.test-success span:first-child,
+.test-error span:first-child {
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.success-message {
+    text-align: center;
+    padding: var(--spacing-lg);
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--success);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto var(--spacing);
+}
+
+.success-message h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.success-message p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.error-message {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing);
+    border: 1px solid #fecaca;
+}
+
+.error-message h3 {
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.125rem;
+}
+
+/* ============================================================================
+   TABLES
+   ============================================================================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing);
+}
+
+thead {
+    background: var(--bg-secondary);
+}
+
+th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-bottom: 2px solid var(--border);
+}
+
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* ============================================================================
+   CONFIGURATION STATUS
+   ============================================================================ */
+
+.config-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-top: var(--spacing-lg);
+    border: 1px solid;
+    animation: slideDown 0.3s ease;
+    position: relative;
+}
+
+.config-status::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.config-status.configured {
+    background: var(--success-light);
+    border-color: #d1fae5;
+    color: var(--success-dark);
+}
+
+.config-status.configured::before {
+    background: var(--success);
+    box-shadow: 0 0 0 3px var(--success-light);
+}
+
+.config-status.not-configured {
+    background: var(--danger-light);
+    border-color: #fecaca;
+    color: var(--danger-dark);
+}
+
+.config-status.not-configured::before {
+    background: var(--danger);
+    box-shadow: 0 0 0 3px var(--danger-light);
+}
+
+.config-status-text {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.config-status strong {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.config-status small {
+    opacity: 0.85;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: var(--spacing-xs);
+}
+
+/* ============================================================================
+   ICON PLACEHOLDERS (for when removing emojis)
+   ============================================================================ */
+
+/* Replace emoji icons with simple text labels */
+.icon-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 500;
+}
+
+/* Success indicator */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    gap: var(--spacing-xs);
+}
+
+.status-indicator.success {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.status-indicator.error {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+}
+
+.status-indicator.warning {
+    background: var(--warning-light);
+    color: var(--warning-dark);
+}
