@@ -1,14 +1,5 @@
 """
 Anomaly Detection Service
-
-CHANGE: Updated to handle dynamic subscription lists
-- Previously: Hardcoded list ['prod', 'dev', 'test', 'main']
-- Now: Accepts any subscription dictionary provided by user
-
-Logic remains the same for detection:
-- Compare target date against rolling calendar average
-- Flag anomalies based on threshold
-- Return detailed results per service
 """
 from datetime import datetime, timedelta
 import calendar
@@ -228,49 +219,23 @@ class AnomalyDetectorService:
         target_date: Optional[datetime] = None,
         threshold_percent: float = 25.0
     ) -> Dict:
-        """
-        Check all subscriptions for anomalies.
-        
-        CHANGE: Now accepts subscriptions dictionary as parameter
-        - Previously: Used hardcoded subscription list from settings
-        - Now: Accepts any dictionary of {name: id} pairs
-        
-        Args:
-            subscriptions: Dict mapping subscription names to IDs
-            target_date: Date to check (defaults to yesterday)
-            threshold_percent: Anomaly threshold
-        
-        Returns:
-            Dictionary with results for all subscriptions and summary
-        """
+        """Check all subscriptions for anomalies"""
         
         if target_date is None:
             target_date = datetime.now() - timedelta(days=1)
         
         all_results = {}
         
-        # Process each subscription dynamically
-        for sub_name, sub_id in subscriptions.items():
-            print(f"\nProcessing subscription: {sub_name} ({sub_id[:8]}...)")
+        for sub_name in ['prod', 'dev', 'test', 'main']:
+            result = self.detect_anomalies(
+                subscriptions[sub_name],
+                sub_name,
+                target_date,
+                threshold_percent
+            )
             
-            try:
-                result = self.detect_anomalies(
-                    sub_id,
-                    sub_name,
-                    target_date,
-                    threshold_percent
-                )
-                
-                if result:
-                    all_results[sub_name] = result
-                    print(f"✓ Completed {sub_name}")
-                else:
-                    print(f"⚠ No data for {sub_name}")
-            
-            except Exception as e:
-                print(f"✗ Error processing {sub_name}: {str(e)}")
-                # Continue with other subscriptions even if one fails
-                continue
+            if result:
+                all_results[sub_name] = result
         
         # Generate summary
         subscriptions_with_anomalies = [

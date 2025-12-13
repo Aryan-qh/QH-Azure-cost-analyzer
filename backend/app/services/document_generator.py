@@ -1,14 +1,5 @@
 """
 Word Document Generation Service
-
-CHANGE: Updated to handle dynamic subscription lists
-- Previously: Hardcoded loop through ['prod', 'dev', 'test', 'main']
-- Now: Iterates through any subscription dictionary provided
-
-Logic:
-- Accept subscription data dictionary with any keys
-- Generate tables for each subscription in the provided order
-- Use subscription names from data keys in report headers
 """
 from docx import Document
 from docx.shared import Pt
@@ -55,20 +46,7 @@ class DocumentGeneratorService:
         doc.add_paragraph()  # Add spacing
     
     def generate_cost_report(self, all_data: Dict, num_days: int) -> str:
-        """
-        Generate a Word document with cost data.
-        
-        CHANGE: Now accepts any subscription dictionary
-        - Previously: Hardcoded ['prod', 'dev', 'test', 'main']
-        - Now: Iterates through all keys in all_data dictionary
-        
-        Args:
-            all_data: Dictionary with subscription names as keys
-            num_days: Number of days covered in the report
-        
-        Returns:
-            Generated filename
-        """
+        """Generate a Word document with cost data"""
         
         doc = Document()
         
@@ -91,26 +69,18 @@ class DocumentGeneratorService:
         # Add greeting
         greeting = doc.add_paragraph()
         greeting.add_run("Hi Team,\n\n").bold = False
-        
-        subscription_text = "subscription" if len(all_data) == 1 else "subscriptions"
         greeting.add_run(
             f"Please find below the Azure cost summary for {date_range_str} "
-            f"for {len(all_data)} {subscription_text}, along with percentage changes "
-            f"compared to the previous day.\n"
+            f"for all subscriptions, along with percentage changes compared to the previous day.\n"
         )
         
-        # Add tables for each subscription dynamically
-        # Sort subscription names alphabetically for consistent ordering
-        sorted_subscriptions = sorted(all_data.keys())
-        
-        for sub_name in sorted_subscriptions:
+        # Add tables for each subscription
+        for sub_name in ['prod', 'dev', 'test', 'main']:
             if sub_name in all_data and all_data[sub_name]:
                 data = all_data[sub_name]
                 
                 # Add subscription header
-                # Capitalize subscription name for display
-                display_name = sub_name.replace('_', ' ').title()
-                doc.add_heading(f'{display_name} Subscription', level=2)
+                doc.add_heading(f'{sub_name.capitalize()} Environment', level=2)
                 
                 # Add cost table
                 self.add_table_to_doc(doc, data['cost_table'], data['headers'])
@@ -120,7 +90,7 @@ class DocumentGeneratorService:
                     doc, 
                     data['percent_table'], 
                     data['headers'],
-                    f"Percentage difference for {display_name}"
+                    f"Percentage difference for {sub_name}"
                 )
         
         # Add closing
@@ -141,19 +111,7 @@ class DocumentGeneratorService:
         cost_data_service,
         cost_processor
     ) -> Dict:
-        """
-        Prepare data for a subscription report.
-        
-        Args:
-            subscription_id: Azure subscription ID
-            subscription_name: Display name for the subscription
-            num_days: Number of days to include
-            cost_data_service: Service to fetch cost data
-            cost_processor: Service to process/categorize costs
-        
-        Returns:
-            Dictionary with cost_table, percent_table, and headers
-        """
+        """Prepare data for a subscription report"""
         
         # Calculate date range
         end_date = datetime.now() - timedelta(days=1)
