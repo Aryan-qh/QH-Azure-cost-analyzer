@@ -1,13 +1,13 @@
 /* ============================================================================
-   TABS NAVIGATION
+   TABS NAVIGATION - Premium Design
    ============================================================================ */
 
 .tabs {
     display: flex;
-    gap: var(--spacing-sm);
-    margin: -1.5rem auto 0;
-    max-width: 1200px;
-    padding: 0 var(--spacing-lg);
+    gap: 0.5rem;
+    margin: -1.75rem auto 0;
+    max-width: 1280px;
+    padding: 0 2rem;
     position: relative;
     z-index: 10;
 }
@@ -15,68 +15,81 @@
 .tab {
     flex: 1;
     padding: 1rem 1.5rem;
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
     border: none;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     position: relative;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.04);
     font-family: inherit;
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid transparent;
 }
 
-.tab:hover:not(.disabled) {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    transform: translateY(-2px);
-}
-
-.tab.active {
-    background: var(--bg-primary);
-    color: var(--primary);
-    box-shadow: 0 -2px 12px rgba(0, 120, 212, 0.15);
-}
-
-.tab.active::after {
+.tab::before {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: var(--primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
+}
+
+.tab:hover:not(.disabled) {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.tab.active {
+    background: var(--bg-primary);
+    color: var(--primary);
+    box-shadow: 0 -4px 16px rgba(0, 102, 204, 0.12);
+    border-bottom-color: var(--primary);
+}
+
+.tab.active::before {
+    transform: scaleX(1);
 }
 
 .tab.disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
-    background: var(--bg-secondary);
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .tab.disabled:hover {
-    background: var(--bg-secondary);
+    background: rgba(255, 255, 255, 0.8);
     color: var(--text-secondary);
     transform: none;
+    box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .tab-tooltip {
     position: absolute;
-    bottom: calc(100% + 0.5rem);
+    bottom: calc(100% + 0.625rem);
     left: 50%;
     transform: translateX(-50%);
-    padding: var(--spacing-sm) var(--spacing);
+    padding: 0.5rem 0.875rem;
     background: var(--text-primary);
     color: white;
     border-radius: var(--radius);
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-base);
     z-index: 1000;
+    box-shadow: var(--shadow-md);
 }
 
 .tab-tooltip::after {
@@ -85,7 +98,7 @@
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border: 6px solid transparent;
+    border: 5px solid transparent;
     border-top-color: var(--text-primary);
 }
 
@@ -107,18 +120,18 @@
    ============================================================================ */
 
 .container > .tab-content {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: var(--spacing-lg);
+    padding: 2rem;
 }
 
 /* ============================================================================
-   CONFIGURATION TAB SPECIFIC
+   CONFIGURATION TAB - Premium Styling
    ============================================================================ */
 
 .config-section {
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-xl);
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
     border-bottom: 1px solid var(--border);
 }
 
@@ -132,32 +145,35 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0.625rem;
+    letter-spacing: -0.01em;
 }
 
 .helper-text {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: var(--spacing-md);
+    font-size: 0.9375rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
 }
 
-/* Cloud Provider Selection */
+/* Cloud Provider Selection - Enhanced */
 .provider-selection {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing);
-    margin-top: var(--spacing);
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .provider-card {
-    padding: var(--spacing-md);
+    padding: 1.5rem;
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     position: relative;
     background: var(--bg-primary);
+    box-shadow: var(--shadow-xs);
 }
 
 .provider-card input[type="radio"] {
@@ -168,36 +184,38 @@
 
 .provider-card:hover:not(.disabled) {
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+    box-shadow: var(--shadow-sm);
     transform: translateY(-2px);
 }
 
 .provider-card.selected {
     border-color: var(--primary);
     background: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.12);
 }
 
 .provider-card.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    background: var(--bg-secondary);
 }
 
 .provider-card.disabled:hover {
     transform: none;
-    box-shadow: none;
+    box-shadow: var(--shadow-xs);
     border-color: var(--border);
 }
 
 .provider-icon {
     font-size: 2.5rem;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0.75rem;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Cloud provider logos - using PNG images */
+/* Cloud provider logos */
 .provider-card[data-provider="azure"] .provider-icon::before {
     content: '';
     display: inline-block;
@@ -225,30 +243,33 @@
 .provider-name {
     font-weight: 600;
     font-size: 1rem;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0.375rem;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
 .provider-status {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
 }
 
 .provider-card.disabled .provider-status {
     color: var(--warning);
+    font-weight: 500;
 }
 
-/* Credential Inputs */
+/* Credential Inputs - Premium Design */
 .credential-group {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 1.25rem;
 }
 
 .credential-group label {
     display: block;
     font-weight: 500;
-    font-size: 0.9rem;
-    margin-bottom: var(--spacing-sm);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
 .credential-input-wrapper {
@@ -257,20 +278,26 @@
 
 .credential-input-wrapper input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    padding-right: 3rem;
-    border: 1px solid var(--border-dark);
+    padding: 0.6875rem 0.875rem;
+    padding-right: 3.5rem;
+    border: 1.5px solid var(--border-dark);
     border-radius: var(--radius);
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9375rem;
+    transition: all var(--transition-base);
+    font-family: var(--font-mono);
     background: var(--bg-primary);
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.credential-input-wrapper input:hover {
+    border-color: var(--text-tertiary);
 }
 
 .credential-input-wrapper input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.08);
 }
 
 .toggle-visibility {
@@ -281,44 +308,52 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.25rem;
-    padding: 0.25rem;
+    padding: 0.375rem 0.5rem;
     color: var(--text-secondary);
-    transition: color 0.2s ease;
+    transition: color var(--transition-base);
     display: flex;
     align-items: center;
+    border-radius: var(--radius-sm);
 }
 
 .toggle-visibility:hover {
     color: var(--primary);
+    background: var(--bg-secondary);
 }
 
-/* Replace eye emojis with text */
 .eye-icon {
     font-style: normal;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     user-select: none;
+    letter-spacing: 0.05em;
 }
 
 .credential-group small {
     display: block;
-    margin-top: var(--spacing-xs);
+    margin-top: 0.375rem;
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
 }
 
-/* Subscription List */
+/* Subscription List - Enhanced */
 .subscription-item {
     display: grid;
     grid-template-columns: 1fr 1fr auto;
-    gap: var(--spacing);
+    gap: 1rem;
     align-items: end;
-    margin-bottom: var(--spacing);
-    padding: var(--spacing-md);
+    margin-bottom: 1rem;
+    padding: 1.25rem;
     background: var(--bg-secondary);
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
+    transition: all var(--transition-base);
+}
+
+.subscription-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-dark);
 }
 
 .subscription-item .form-group {
@@ -332,11 +367,11 @@
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: bold;
-    transition: all 0.2s ease;
-    height: 44px;
-    width: 44px;
+    transition: all var(--transition-base);
+    height: 42px;
+    width: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -344,17 +379,18 @@
 
 .remove-subscription-btn:hover {
     background: var(--danger-light);
+    color: var(--danger-dark);
 }
 
 /* ============================================================================
-   ANOMALY DETECTION TAB
+   ANOMALY DETECTION TAB - Premium Design
    ============================================================================ */
 
 .summary-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
     border-bottom: 1px solid var(--border);
 }
 
@@ -362,33 +398,44 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0;
+    letter-spacing: -0.015em;
 }
 
 .summary-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing);
-    padding: var(--spacing-lg);
+    gap: 1rem;
+    padding: 1.5rem;
 }
 
 .stat-box {
-    padding: var(--spacing);
-    background: var(--bg-secondary);
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     border-radius: var(--radius-md);
     text-align: center;
+    border: 1px solid var(--border-light);
+    transition: all var(--transition-base);
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 .stat-box .label {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0.5rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .stat-box .value {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--text-primary);
+    letter-spacing: -0.02em;
 }
 
 .stat-box .value.highlight {
@@ -396,50 +443,61 @@
 }
 
 .subscription-list-container {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
 }
 
 .subscription-card {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    box-shadow: var(--shadow);
-    margin-bottom: var(--spacing);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.25rem;
     border-left: 4px solid var(--border);
+    border: 1px solid var(--border-light);
+    transition: all var(--transition-base);
+}
+
+.subscription-card:hover {
+    box-shadow: var(--shadow);
 }
 
 .subscription-card.has-anomaly {
-    border-left-color: var(--danger);
+    border-left: 4px solid var(--danger);
+    background: var(--bg-primary);
 }
 
 .subscription-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing);
+    margin-bottom: 1rem;
 }
 
 .subscription-name {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-primary);
+    letter-spacing: 0.025em;
 }
 
 .anomaly-indicator {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    padding: 0.25rem 0.75rem;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.75rem;
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid;
 }
 
 .anomaly-indicator::before {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -447,19 +505,24 @@
 .anomaly-indicator.normal {
     background: var(--success-light);
     color: var(--success-dark);
+    border-color: rgba(14, 169, 114, 0.2);
 }
 
 .anomaly-indicator.normal::before {
     background: var(--success);
+    box-shadow: 0 0 4px var(--success);
 }
 
 .anomaly-indicator.anomaly {
     background: var(--danger-light);
     color: var(--danger-dark);
+    border-color: rgba(229, 72, 77, 0.2);
 }
 
 .anomaly-indicator.anomaly::before {
     background: var(--danger);
+    box-shadow: 0 0 4px var(--danger);
+    animation: pulse 2s ease-in-out infinite;
 }
 
 .change-positive {
@@ -473,16 +536,20 @@
 }
 
 /* ============================================================================
-   SUMMARY BADGE
+   SUMMARY BADGE - Enhanced
    ============================================================================ */
 
 #summary-badge {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
     display: flex;
     justify-content: center;
 }
 
 #summary-badge .badge {
     font-size: 1rem;
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 1.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
 }
