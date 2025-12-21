@@ -37,11 +37,6 @@ A modern web application for monitoring Azure costs with intelligent anomaly det
 
 ### 1. Clone Repository
 
-```bash
-git clone https://github.com/yourusername/azure-cost-analyzer.git
-cd azure-cost-analyzer
-```
-
 ### 2. Set Up Azure AD Application
 
 1. Go to Azure Portal → Azure Active Directory → App registrations
@@ -73,10 +68,6 @@ For each subscription you want to monitor:
 In the `backend/` directory, create a `.env` file:
 
 ```bash
-# Azure AD Configuration
-AZURE_TENANT_ID=your-tenant-id
-AZURE_CLIENT_ID=your-client-id
-AZURE_CLIENT_SECRET=your-client-secret
 
 # OpenAI Configuration (for AI Agent)
 OPENAI_API_KEY=sk-your-openai-api-key
@@ -85,9 +76,6 @@ OPENAI_API_KEY=sk-your-openai-api-key
 API_HOST=0.0.0.0
 API_PORT=8000
 OUTPUT_DIRECTORY=../outputs
-
-# Note: Subscription IDs are now configured via the web UI
-# No need to add them here anymore!
 ```
 
 ### 6. Install Python Dependencies
