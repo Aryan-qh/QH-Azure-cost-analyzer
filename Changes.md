@@ -1,6 +1,6 @@
 # 🔄 Update Summary - AI Agent Integration
 
-## **New Features**
+## **Backend Changes**
 
 ### **1. AI Agent for Cost Analysis**
 
@@ -16,11 +16,11 @@
 - 30-minute session timeout
 
 **New Endpoints:**
-- `POST /api/agent/chat` - Send message
-- `POST /api/agent/conversation/new` - Create conversation
-- `GET /api/agent/conversations` - List conversations
+- `POST /api/agent/chat` - Send message to AI agent
+- `POST /api/agent/conversation/new` - Create new conversation
+- `GET /api/agent/conversations` - List all conversations
 - `DELETE /api/agent/conversation/{id}` - Delete conversation
-- `GET /api/agent/conversation/{id}/history` - Get history
+- `GET /api/agent/conversation/{id}/history` - Get conversation history
 
 **Example Queries:**
 ```
@@ -29,9 +29,44 @@
 "Show Virtual Machine costs for last 7 days"
 ```
 
-## **Integration**
+---
 
-- Uses existing Azure services (no changes to business logic)
-- Session-based (tied to user configuration)
-- In-memory storage (extendable to Redis)
-- All existing features unchanged
+## **Frontend Changes**
+
+### **1. New AI Agent Tab**
+
+**New Files:**
+- `js/components/agent.js` - Agent component with conversation management
+- `js/ui/chatUI.js` - Chat message rendering and formatting
+- `css/chat.css` - Chat interface styles
+
+**Modified Files:**
+- `index.html` - Added AI Agent tab with chat interface
+- `js/main.js` - Initialize agent component
+- `js/services/apiService.js` - Added 6 new agent API methods
+- `js/components/tabs.js` - Enable/disable agent tab based on config
+- `css/responsive.css` - Mobile-responsive chat styles
+
+### **2. Chat Interface Features**
+
+**Conversation Management:**
+- Create new conversations
+- Switch between multiple conversations
+- Delete conversations
+- View conversation history with message count and timestamps
+
+**Message Display:**
+- User messages (right-aligned, blue background)
+- Assistant messages (left-aligned with avatar)
+- Error messages (red background with icon)
+- Tool call visualization (shows which Azure APIs were called)
+- Markdown-like formatting (bold, italic, code)
+
+**User Experience:**
+- Auto-resizing textarea (grows as you type)
+- Enter to send, Shift+Enter for new line
+- Welcome message with example queries
+- Typing indicator while agent is thinking
+- Smooth animations and transitions
+- Timestamp display (relative: "5m ago", "Today at 2:30 PM")
+
