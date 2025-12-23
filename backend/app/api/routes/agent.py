@@ -2,11 +2,6 @@
 """
 AI Agent API Routes - LangChain Version
 
-CHANGES FROM PREVIOUS VERSION:
-1. Agent service now instantiated per request (with user config)
-2. Simplified tool call handling (LangChain manages this)
-3. Response format slightly different (LangChain standard)
-
 ENDPOINTS:
 1. POST /api/agent/chat - Send a message to the agent
 2. POST /api/agent/conversation/new - Create new conversation

@@ -2,16 +2,6 @@
 """
 Anomaly Detection API Routes
 
-CHANGES:
-1. ADDED: session_id parameter to requests
-   - Required to retrieve user configuration
-   
-2. UPDATED: Credentials and subscriptions now from session config
-   - Previously from hardcoded settings
-   
-3. ADDED: Session validation
-   - Check if session exists and is valid before processing
-
 Logic:
 - Retrieve user config from session_id
 - Extract credentials and subscriptions from config

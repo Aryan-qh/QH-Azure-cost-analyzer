@@ -15,10 +15,6 @@ class CostProcessorService:
         """
         Process raw cost data into categories.
         
-        CHANGE #2: Added two new cost categories
-        - Bandwidth: Captures data transfer and bandwidth costs
-        - Virtual Network: Captures VNet, VPN, and related networking costs
-        
         Category Mapping Logic:
         - Databricks: 'Azure Databricks' service
         - Virtual Machine: 'Virtual Machines' service

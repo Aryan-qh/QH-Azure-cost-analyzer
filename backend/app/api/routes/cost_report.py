@@ -2,16 +2,6 @@
 """
 Cost Report API Routes
 
-CHANGES:
-1. ADDED: session_id parameter to requests
-   - Required to retrieve user configuration
-   
-2. UPDATED: Subscriptions now from session config
-   - Previously hardcoded list of 4 subscriptions
-   
-3. UPDATED: Dynamic subscription processing
-   - Loop through user's configured subscriptions
-
 Logic:
 - Retrieve user config from session_id
 - Extract credentials and subscriptions

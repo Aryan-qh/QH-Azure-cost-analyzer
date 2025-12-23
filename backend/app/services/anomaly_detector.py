@@ -1,11 +1,6 @@
 """
 Anomaly Detection Service
-
-CHANGE: Updated to handle dynamic subscription lists
-- Previously: Hardcoded list ['prod', 'dev', 'test', 'main']
-- Now: Accepts any subscription dictionary provided by user
-
-Logic remains the same for detection:
+Logic :
 - Compare target date against rolling calendar average
 - Flag anomalies based on threshold
 - Return detailed results per service
@@ -181,7 +176,7 @@ class AnomalyDetectorService:
                     'current_cost': round(current_cost, 2),
                     'percent_change': round(percent_change, 2)
                 })
-                print(f"  ⚠️  ANOMALY: {service_name} - ${current_cost:.2f} vs ${avg_cost:.2f} avg ({percent_change:+.2f}%)")
+                print(f"ANOMALY: {service_name} - ${current_cost:.2f} vs ${avg_cost:.2f} avg ({percent_change:+.2f}%)")
         
         # Sort results by current cost (descending)
         results.sort(key=lambda x: x['current_cost'], reverse=True)

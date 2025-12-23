@@ -1,21 +1,10 @@
 """
-FastAPI Application Entry Point
-
-CHANGES FROM PREVIOUS VERSION:
-1. ADDED: Agent API routes
-   - POST /api/agent/chat - Conversational AI for cost analysis
-   - POST /api/agent/conversation/new - Create new conversation
-   - GET /api/agent/conversations - List conversations
-   - DELETE /api/agent/conversation/{id} - Delete conversation
-   - GET /api/agent/conversation/{id}/history - Get history
-
-2. ADDED: Import of agent router
+FastAPI Application Entry Pointr
 
 Logic:
 - Configuration endpoints handle user credentials and subscriptions
 - Agent endpoints provide conversational interface to cost data
 - All endpoints maintain session-based isolation
-- Enhanced error handling for configuration and agent issues
 """
 from dotenv import load_dotenv
 load_dotenv()

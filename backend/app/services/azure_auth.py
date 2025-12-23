@@ -1,20 +1,9 @@
 """
 Azure Authentication Service
 
-CHANGES:
-1. REMOVED: Dependency on Settings class for credentials
-   - Previously read from config.py/env file
-   
-2. ADDED: Constructor parameters for credentials
-   - tenant_id, client_id, client_secret now passed as arguments
-   
-3. REMOVED: get_subscriptions() method
-   - Subscriptions now come from user configuration, not hardcoded
-
 Logic:
 - Accept credentials as constructor parameters
 - Generate access token using provided credentials
-- No longer stores or manages subscription list
 - Each instance is tied to specific user credentials
 """
 import requests
@@ -24,11 +13,6 @@ from typing import Optional
 class AzureAuthService:
     """
     Handle Azure AD authentication with user-provided credentials.
-    
-    SECURITY NOTE:
-    - Never log or print credentials
-    - Access tokens cached per instance
-    - Credentials stored in memory only during object lifetime
     """
     
     def __init__(self, tenant_id: str, client_id: str, client_secret: str):

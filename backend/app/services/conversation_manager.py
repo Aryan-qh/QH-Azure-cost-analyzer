@@ -7,20 +7,7 @@ PURPOSE: Manage multi-turn conversations with history and context
 - Handle conversation lifecycle (create, update, delete)
 - Prepare conversation context for LangChain agents
 
-LANGCHAIN INTEGRATION:
-- This manager stores conversations for persistence across sessions
-- LangChain has built-in memory (ConversationBufferMemory, etc.) but:
-  * LangChain memory is in-process only (lost on server restart)
-  * This manager provides session isolation and TTL
-  * Can be replaced with LangChain's RedisChatMessageHistory later
-
-FUTURE OPTIONS:
-1. Keep current implementation (works great with LangChain)
-2. Use LangChain's RedisChatMessageHistory for distributed systems
-3. Use LangChain's ConversationEntityMemory for entity tracking
-4. Combine: This manager for persistence + LangChain memory for processing
-
-CURRENT APPROACH (RECOMMENDED):
+CURRENT APPROACH:
 - Use this manager for storage and retrieval
 - Convert to LangChain message format when invoking agent
 - Best of both worlds: persistence + LangChain's powerful memory features
@@ -311,21 +298,3 @@ def get_conversation_manager() -> ConversationManagerService:
     return _conversation_manager
 
 
-# LANGCHAIN MIGRATION NOTES:
-# 
-# If you want to use LangChain's built-in memory classes in the future:
-#
-# Option 1: Use LangChain's ConversationBufferMemory
-# from langchain.memory import ConversationBufferMemory
-# memory = ConversationBufferMemory(return_messages=True)
-#
-# Option 2: Use LangChain's RedisChatMessageHistory (for distributed systems)
-# from langchain.memory import RedisChatMessageHistory
-# history = RedisChatMessageHistory(session_id="xyz", url="redis://localhost:6379")
-#
-# Option 3: Hybrid approach (RECOMMENDED)
-# - Keep this manager for persistence and session isolation
-# - Use LangChain memory for in-process reasoning and entity tracking
-# - Best of both worlds
-#
-# Current implementation works great with LangChain and requires no changes!
