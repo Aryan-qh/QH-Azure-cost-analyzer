@@ -1,20 +1,23 @@
 """
 Word Document Generation Service
 
-CHANGE: Updated to handle dynamic subscription lists
-- Previously: Hardcoded loop through ['prod', 'dev', 'test', 'main']
-- Now: Iterates through any subscription dictionary provided
+CHANGE: Added anomaly detection section to reports
+- New parameter: anomaly_data (optional, backward compatible)
+- New method: add_anomaly_section() - Formats and adds anomaly tables
+- Enhanced generate_cost_report() - Includes anomaly summary at bottom
 
 Logic:
 - Accept subscription data dictionary with any keys
-- Generate tables for each subscription in the provided order
-- Use subscription names from data keys in report headers
+- Generate cost tables for each subscription
+- NEW: Add anomaly detection summary if data provided
+- Anomaly section shows only days with detected anomalies
+- Groups anomalies by date for clarity
 """
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict, List, Optional
 import os
 
 
@@ -54,17 +57,119 @@ class DocumentGeneratorService:
         
         doc.add_paragraph()  # Add spacing
     
-    def generate_cost_report(self, all_data: Dict, num_days: int) -> str:
+    def add_anomaly_section(self, doc: Document, anomaly_data: List[Dict], threshold: float):
         """
-        Generate a Word document with cost data.
+        NEW METHOD: Add anomaly detection summary to the document.
         
-        CHANGE: Now accepts any subscription dictionary
-        - Previously: Hardcoded ['prod', 'dev', 'test', 'main']
-        - Now: Iterates through all keys in all_data dictionary
+        Logic:
+        1. Add a section header "Anomaly Detection Summary"
+        2. For each day in the anomaly data:
+           - Check if any anomalies were detected
+           - If yes, create a table showing:
+             * Subscription name
+             * Service name
+             * Average cost
+             * Current cost
+             * Percentage change
+        3. If no anomalies found for any day, add a note saying so
+        
+        Args:
+            doc: Document object to add content to
+            anomaly_data: List of anomaly detection results per day
+            threshold: Threshold percentage used for detection
+        """
+        
+        # Add section divider
+        doc.add_page_break()
+        
+        # Add section header
+        header = doc.add_heading('Anomaly Detection Summary', level=1)
+        header.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        # Add explanation paragraph
+        explanation = doc.add_paragraph()
+        explanation.add_run(
+            f"The following section shows cost anomalies detected during the report period. "
+            f"An anomaly is flagged when a service's cost exceeds the rolling average by more than {threshold:.1f}%.\n\n"
+        )
+        
+        # Track if any anomalies were found
+        total_anomalies_found = False
+        
+        # Process each day
+        for day_result in anomaly_data:
+            date_str = day_result.get('date', 'Unknown Date')
+            day_name = day_result.get('day_name', '')
+            subscriptions = day_result.get('subscriptions', {})
+            
+            # Check if this day has any anomalies
+            day_has_anomalies = False
+            anomaly_rows = []
+            
+            for sub_name, sub_data in subscriptions.items():
+                if not sub_data or not sub_data.get('has_anomalies', False):
+                    continue
+                
+                day_has_anomalies = True
+                
+                # Get anomaly details
+                anomalies = sub_data.get('anomalies', [])
+                
+                for anomaly in anomalies:
+                    anomaly_rows.append([
+                        sub_name,
+                        anomaly['service'],
+                        f"${anomaly['average_cost']:.2f}",
+                        f"${anomaly['current_cost']:.2f}",
+                        f"{anomaly['percent_change']:+.2f}%"
+                    ])
+            
+            # If this day has anomalies, add a table
+            if day_has_anomalies:
+                total_anomalies_found = True
+                
+                # Add date header
+                date_header = doc.add_paragraph()
+                run = date_header.add_run(f"{day_name}, {date_str}")
+                run.bold = True
+                run.font.size = Pt(12)
+                run.font.color.rgb = RGBColor(192, 0, 0)  # Red color for emphasis
+                
+                # Add anomaly table
+                headers = ['Subscription', 'Service', 'Average Cost', 'Current Cost', 'Change %']
+                self.add_table_to_doc(doc, anomaly_rows, headers)
+                
+                # Add summary note
+                summary = doc.add_paragraph()
+                summary.add_run(
+                    f"Found {len(anomaly_rows)} anomal{'y' if len(anomaly_rows) == 1 else 'ies'} on this date.\n"
+                ).italic = True
+        
+        # If no anomalies found at all, add a note
+        if not total_anomalies_found:
+            no_anomalies = doc.add_paragraph()
+            run = no_anomalies.add_run("✓ No cost anomalies detected during this period.")
+            run.font.size = Pt(11)
+            run.font.color.rgb = RGBColor(0, 128, 0)  # Green color
+            run.bold = True
+    
+    def generate_cost_report(
+        self, 
+        all_data: Dict, 
+        num_days: int,
+        anomaly_data: Optional[List[Dict]] = None
+    ) -> str:
+        """
+        Generate a Word document with cost data and optional anomaly detection.
+        
+        CHANGE: Added optional anomaly_data parameter
+        - Backward compatible: If anomaly_data is None, works as before
+        - If anomaly_data provided, adds anomaly section at bottom
         
         Args:
             all_data: Dictionary with subscription names as keys
             num_days: Number of days covered in the report
+            anomaly_data: Optional list of anomaly detection results (NEW)
         
         Returns:
             Generated filename
@@ -123,6 +228,12 @@ class DocumentGeneratorService:
                     f"Percentage difference for {display_name}"
                 )
         
+        # NEW: Add anomaly detection section if data provided
+        if anomaly_data:
+            # Get threshold from first result (all use same threshold)
+            threshold = anomaly_data[0].get('threshold', 25.0) if anomaly_data else 25.0
+            self.add_anomaly_section(doc, anomaly_data, threshold)
+        
         # Add closing
         doc.add_paragraph("\nThank you.")
         
@@ -143,6 +254,8 @@ class DocumentGeneratorService:
     ) -> Dict:
         """
         Prepare data for a subscription report.
+        
+        UNCHANGED: This method remains the same
         
         Args:
             subscription_id: Azure subscription ID
