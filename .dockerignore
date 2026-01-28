@@ -1,0 +1,35 @@
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Documentation
+*.md
+LICENSE
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+
+# Outputs
+outputs/
+
+# Environment files (handle separately)
+.env
+.env.*
