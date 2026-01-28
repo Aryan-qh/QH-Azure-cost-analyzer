@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: azure-cost-analyzer-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # These can be overridden by creating a .env file in the root directory
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - OUTPUT_DIRECTORY=outputs
+      - SESSION_TIMEOUT_MINUTES=30
+    volumes:
+      # Mount outputs directory to persist generated reports
+      - ./outputs:/app/outputs
+      # Optional: Mount .env file if you prefer file-based config
+      # - ./backend/.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - azure-cost-analyzer
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: azure-cost-analyzer-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - azure-cost-analyzer
+
+networks:
+  azure-cost-analyzer:
+    driver: bridge
+
+volumes:
+  outputs:
+    driver: local
