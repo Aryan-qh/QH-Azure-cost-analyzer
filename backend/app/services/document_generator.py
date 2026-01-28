@@ -1,5 +1,21 @@
 """
-Word Document Generation Service
+Word Document Generation Service - SIMPLIFIED VERSION
+
+CHANGE: Refactored to generate simple summary reports
+- Removed detailed resource breakdown (moved to Excel)
+- Removed anomaly detection section (moved to Excel)
+- Now creates email-friendly summaries with only subscription totals
+
+PURPOSE:
+Generate simple Word documents showing:
+1. Daily total costs per subscription
+2. Period summary with grand total
+3. Reference to Excel file for details
+
+Logic:
+- Single table with Date | Subscription1 | Subscription2 | ... | Total
+- Clean, concise format suitable for email
+- Detailed analysis moved to Excel file
 """
 from docx import Document
 from docx.shared import Pt
@@ -10,7 +26,7 @@ import os
 
 
 class DocumentGeneratorService:
-    """Generate Word documents for cost reports"""
+    """Generate simple Word documents for cost report summaries"""
     
     def __init__(self, output_directory: str):
         self.output_directory = output_directory
@@ -45,8 +61,26 @@ class DocumentGeneratorService:
         
         doc.add_paragraph()  # Add spacing
     
-    def generate_cost_report(self, all_data: Dict, num_days: int) -> str:
-        """Generate a Word document with cost data"""
+    def generate_cost_report(
+        self, 
+        all_data: Dict, 
+        num_days: int
+    ) -> str:
+        """
+        Generate a SIMPLIFIED Word document with only subscription totals.
+        
+        CHANGE: Removed detailed resource breakdown and anomalies
+        - Now shows only total cost per subscription per day
+        - Detailed breakdown moved to Excel file
+        - Designed for email-friendly summary
+        
+        Args:
+            all_data: Dictionary with subscription names as keys
+            num_days: Number of days covered in the report
+        
+        Returns:
+            Generated filename
+        """
         
         doc = Document()
         
@@ -69,35 +103,93 @@ class DocumentGeneratorService:
         # Add greeting
         greeting = doc.add_paragraph()
         greeting.add_run("Hi Team,\n\n").bold = False
+        
+        subscription_text = "subscription" if len(all_data) == 1 else "subscriptions"
         greeting.add_run(
             f"Please find below the Azure cost summary for {date_range_str} "
-            f"for all subscriptions, along with percentage changes compared to the previous day.\n"
+            f"for {len(all_data)} {subscription_text}.\n\n"
+            f"For detailed resource breakdown and anomaly detection, please refer to the accompanying Excel file.\n"
         )
         
-        # Add tables for each subscription
-        for sub_name in ['prod', 'dev', 'test', 'main']:
+        # Create single summary table with all subscriptions
+        # Sort subscription names alphabetically for consistent ordering
+        sorted_subscriptions = sorted(all_data.keys())
+        
+        # Build table: Date | Subscription1 | Subscription2 | ... | Total
+        table_headers = ['Date'] + [sub.replace('_', ' ').title() for sub in sorted_subscriptions] + ['Total']
+        table_data = []
+        
+        # Extract totals for each day
+        for day_idx in range(num_days):
+            row = []
+            
+            # Date (from first subscription's data)
+            first_sub = sorted_subscriptions[0]
+            if day_idx < len(all_data[first_sub]['cost_table']):
+                date_str = all_data[first_sub]['cost_table'][day_idx][0]
+                row.append(date_str)
+            else:
+                continue
+            
+            # Each subscription's total for this day
+            day_total = 0.0
+            for sub_name in sorted_subscriptions:
+                if sub_name in all_data and all_data[sub_name]:
+                    data = all_data[sub_name]
+                    if day_idx < len(data['cost_table']):
+                        cost_row = data['cost_table'][day_idx]
+                        # Last value in cost_table is the total
+                        total_str = cost_row[-1]
+                        row.append(total_str)
+                        # Add to day total (remove $ and commas)
+                        day_total += float(total_str.replace('$', '').replace(',', ''))
+                    else:
+                        row.append('$0.00')
+                else:
+                    row.append('$0.00')
+            
+            # Add day total
+            row.append(f'${day_total:,.2f}')
+            table_data.append(row)
+        
+        # Add the table
+        self.add_table_to_doc(doc, table_data, table_headers, "Daily Total Costs by Subscription")
+        
+        # Add period summary
+        doc.add_paragraph()
+        summary_para = doc.add_paragraph()
+        summary_para.add_run("Period Summary:\n").bold = True
+        
+        # Calculate totals for each subscription
+        for sub_name in sorted_subscriptions:
             if sub_name in all_data and all_data[sub_name]:
                 data = all_data[sub_name]
+                sub_total = 0.0
                 
-                # Add subscription header
-                doc.add_heading(f'{sub_name.capitalize()} Environment', level=2)
+                for cost_row in data['cost_table']:
+                    total_str = cost_row[-1]
+                    sub_total += float(total_str.replace('$', '').replace(',', ''))
                 
-                # Add cost table
-                self.add_table_to_doc(doc, data['cost_table'], data['headers'])
-                
-                # Add percentage difference table
-                self.add_table_to_doc(
-                    doc, 
-                    data['percent_table'], 
-                    data['headers'],
-                    f"Percentage difference for {sub_name}"
-                )
+                display_name = sub_name.replace('_', ' ').title()
+                summary_para.add_run(f"â€¢ {display_name}: ${sub_total:,.2f}\n")
+        
+        # Grand total
+        grand_total = 0.0
+        for sub_name in sorted_subscriptions:
+            if sub_name in all_data and all_data[sub_name]:
+                data = all_data[sub_name]
+                for cost_row in data['cost_table']:
+                    total_str = cost_row[-1]
+                    grand_total += float(total_str.replace('$', '').replace(',', ''))
+        
+        summary_para.add_run(f"\nGrand Total: ${grand_total:,.2f}").bold = True
         
         # Add closing
+        doc.add_paragraph("\nFor detailed analysis, please see the attached Excel file.")
         doc.add_paragraph("\nThank you.")
         
         # Save document
-        filename = f"Azure_Cost_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
+        filename = f"Azure_Cost_Summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
         filepath = os.path.join(self.output_directory, filename)
         doc.save(filepath)
         
@@ -111,7 +203,21 @@ class DocumentGeneratorService:
         cost_data_service,
         cost_processor
     ) -> Dict:
-        """Prepare data for a subscription report"""
+        """
+        Prepare data for a subscription report.
+        
+        UNCHANGED: This method remains the same - still needed to gather cost data
+        
+        Args:
+            subscription_id: Azure subscription ID
+            subscription_name: Display name for the subscription
+            num_days: Number of days to include
+            cost_data_service: Service to fetch cost data
+            cost_processor: Service to process/categorize costs
+        
+        Returns:
+            Dictionary with cost_table, percent_table, and headers
+        """
         
         # Calculate date range
         end_date = datetime.now() - timedelta(days=1)
@@ -144,23 +250,27 @@ class DocumentGeneratorService:
             costs = cost_processor.process_cost_data(day_rows)
             all_costs.append(costs)
         
-        # Determine categories
+        # Determine categories (does not include 'Total')
         categories = cost_processor.get_relevant_categories(all_costs, subscription_name)
         
-        # Build cost table
+        # Build cost table - include each service AND Total at the end
         for i, costs in enumerate(all_costs):
             row = [date_strings[i]]
+            # Add each service cost (use .get() to handle missing services)
             for category in categories:
-                row.append(f"${costs[category]:.2f}")
+                row.append(f"${costs.get(category, 0.0):.2f}")
+            # IMPORTANT: Add Total as the last column
+            row.append(f"${costs.get('Total', 0.0):.2f}")
             cost_table_data.append(row)
         
         # Build percentage change table
         for i in range(1, len(all_costs)):
             row = [date_strings[i]]
             
+            # Calculate percentage change for each service
             for category in categories:
-                prev_cost = all_costs[i - 1][category]
-                curr_cost = all_costs[i][category]
+                prev_cost = all_costs[i - 1].get(category, 0.0)
+                curr_cost = all_costs[i].get(category, 0.0)
                 
                 percent_change = cost_processor.calculate_percentage_change(
                     prev_cost, curr_cost
@@ -168,9 +278,18 @@ class DocumentGeneratorService:
                 
                 row.append(f"{percent_change:+.2f}%")
             
+            # IMPORTANT: Add Total percentage change
+            prev_total = all_costs[i - 1].get('Total', 0.0)
+            curr_total = all_costs[i].get('Total', 0.0)
+            total_percent_change = cost_processor.calculate_percentage_change(
+                prev_total, curr_total
+            )
+            row.append(f"{total_percent_change:+.2f}%")
+            
             percent_table_data.append(row)
         
-        headers = ['Date'] + categories
+        # IMPORTANT: Headers include services + Total at the end
+        headers = ['Date'] + categories + ['Total']
         
         return {
             'cost_table': cost_table_data,

@@ -1,44 +1,109 @@
 """
 Azure Authentication Service
+
+Logic:
+- Accept credentials as constructor parameters
+- Generate access token using provided credentials
+- Each instance is tied to specific user credentials
 """
 import requests
 from typing import Optional
-from app.config import Settings
 
 
 class AzureAuthService:
-    """Handle Azure AD authentication"""
+    """
+    Handle Azure AD authentication with user-provided credentials.
+    """
     
-    def __init__(self, settings: Settings):
-        self.settings = settings
+    def __init__(self, tenant_id: str, client_id: str, client_secret: str):
+        """
+        Initialize Azure authentication service.
+        
+        Args:
+            tenant_id: Azure AD Tenant ID (GUID)
+            client_id: Azure AD Application/Client ID (GUID)
+            client_secret: Azure AD Client Secret
+        """
+        self.tenant_id = tenant_id
+        self.client_id = client_id
+        self.client_secret = client_secret
         self._access_token: Optional[str] = None
     
-    def get_access_token(self) -> str:
-        """Get or refresh Azure AD access token"""
-        if self._access_token:
+    def get_access_token(self, force_refresh: bool = False) -> str:
+        """
+        Get or refresh Azure AD access token.
+        
+        Args:
+            force_refresh: If True, force token refresh even if cached
+        
+        Returns:
+            Valid Azure access token
+        
+        Raises:
+            Exception: If authentication fails
+        """
+        # Return cached token if available and not forcing refresh
+        if self._access_token and not force_refresh:
             return self._access_token
         
-        auth_url = f'https://login.microsoftonline.com/{self.settings.azure_tenant_id}/oauth2/token'
+        # Azure AD token endpoint
+        auth_url = f'https://login.microsoftonline.com/{self.tenant_id}/oauth2/token'
+        
+        # Request body for client credentials flow
         auth_data = {
             'grant_type': 'client_credentials',
-            'client_id': self.settings.azure_client_id,
-            'client_secret': self.settings.azure_client_secret,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
             'resource': 'https://management.azure.com/'
         }
         
         try:
             response = requests.post(auth_url, data=auth_data, timeout=30)
             response.raise_for_status()
+            
+            # Extract and cache access token
             self._access_token = response.json()['access_token']
             return self._access_token
-        except Exception as e:
-            raise Exception(f"Failed to authenticate with Azure AD: {str(e)}")
+            
+        except requests.exceptions.HTTPError as e:
+            # Handle specific authentication errors
+            if e.response.status_code == 400:
+                error_data = e.response.json()
+                error_desc = error_data.get('error_description', 'Invalid credentials')
+                raise Exception(f"Authentication failed: {error_desc}")
+            elif e.response.status_code == 401:
+                raise Exception("Authentication failed: Invalid client credentials")
+            else:
+                raise Exception(f"Authentication failed: HTTP {e.response.status_code}")
+                
+        except requests.exceptions.Timeout:
+            raise Exception("Authentication failed: Request timed out")
+            
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Authentication failed: {str(e)}")
+        
+        except KeyError:
+            raise Exception("Authentication failed: Invalid response format")
     
-    def get_subscriptions(self) -> dict:
-        """Get all configured subscriptions"""
-        return {
-            'main': self.settings.subscription_main,
-            'prod': self.settings.subscription_prod,
-            'dev': self.settings.subscription_dev,
-            'test': self.settings.subscription_test
-        }
+    def test_connection(self) -> dict:
+        """
+        Test if credentials are valid by attempting to get access token.
+        
+        Returns:
+            Dictionary with success status and message
+        """
+        try:
+            self.get_access_token(force_refresh=True)
+            return {
+                'success': True,
+                'message': 'Successfully authenticated with Azure'
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'message': str(e)
+            }
+    
+    def clear_cached_token(self):
+        """Clear cached access token (useful for logout or testing)"""
+        self._access_token = None

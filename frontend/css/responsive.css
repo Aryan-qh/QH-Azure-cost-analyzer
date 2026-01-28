@@ -1,0 +1,632 @@
+/* ============================================================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ============================================================================ */
+
+/* Tablet & Small Desktop */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+    }
+
+    header .container,
+    .tabs,
+    .container > .tab-content {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .summary-stats {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    /* Agent responsive */
+    .agent-container {
+        grid-template-columns: 240px 1fr;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    header {
+        padding: 1.5rem 0 2rem 0;
+    }
+
+    header h1 {
+        font-size: 1.625rem;
+    }
+
+    header h1::before {
+        width: 40px;
+        height: 40px;
+    }
+
+    .subtitle {
+        font-size: 0.875rem;
+        margin-left: 52px;
+    }
+
+    .tabs {
+        flex-direction: column;
+        gap: 0.375rem;
+        margin-top: -1.5rem;
+    }
+
+    .tab {
+        border-radius: var(--radius);
+    }
+
+    .tab-tooltip {
+        display: none;
+    }
+
+    .container > .tab-content {
+        padding: 1.5rem;
+    }
+
+    .card {
+        border-radius: var(--radius-lg);
+    }
+
+    .card h2 {
+        font-size: 1.375rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .provider-selection {
+        grid-template-columns: 1fr;
+    }
+
+    .subscription-item {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .remove-subscription-btn {
+        width: 100%;
+        height: 40px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 0.625rem;
+    }
+
+    .button-group .btn {
+        width: 100%;
+    }
+
+    .summary-stats {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .subscription-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .stat-box .value {
+        font-size: 1.5rem;
+    }
+
+    table {
+        font-size: 0.875rem;
+    }
+
+    th, td {
+        padding: 0.75rem;
+    }
+
+    /* Agent responsive */
+    .agent-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 500px;
+    }
+
+    .conversation-sidebar {
+        display: none; /* Hide sidebar on mobile, show in expandable panel if needed */
+    }
+
+    .chat-area {
+        height: 70vh;
+        min-height: 500px;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+
+    .message-assistant {
+        max-width: 90%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    header {
+        padding: 1.25rem 0 1.75rem 0;
+    }
+
+    header .container,
+    .tabs,
+    .container > .tab-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.375rem;
+    }
+
+    header h1::before {
+        width: 36px;
+        height: 36px;
+    }
+
+    .subtitle {
+        font-size: 0.8125rem;
+        margin-left: 48px;
+    }
+
+    .tabs {
+        margin-top: -1.25rem;
+    }
+
+    .tab {
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .container > .tab-content {
+        padding: 1rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card > div[style*="padding"] {
+        padding: 1.25rem !important;
+    }
+
+    .card h2 {
+        font-size: 1.25rem;
+    }
+
+    .card h3 {
+        font-size: 1rem;
+    }
+
+    .card-subtitle {
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+
+    .form-group label {
+        font-size: 0.8125rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .form-group small {
+        font-size: 0.75rem;
+    }
+
+    .provider-card {
+        padding: 1.25rem;
+    }
+
+    .provider-name {
+        font-size: 0.9375rem;
+    }
+
+    .provider-status {
+        font-size: 0.75rem;
+    }
+
+    .credential-input-wrapper input {
+        padding: 0.625rem 0.75rem;
+        padding-right: 3rem;
+        font-size: 0.875rem;
+    }
+
+    .toggle-visibility {
+        right: 0.5rem;
+    }
+
+    .eye-icon {
+        font-size: 0.625rem;
+    }
+
+    .subscription-item {
+        padding: 1rem;
+    }
+
+    .config-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .helper-text {
+        font-size: 0.875rem;
+    }
+
+    .badge {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .stat-box {
+        padding: 1rem;
+    }
+
+    .stat-box .label {
+        font-size: 0.75rem;
+    }
+
+    .stat-box .value {
+        font-size: 1.375rem;
+    }
+
+    .subscription-card {
+        padding: 1.25rem;
+    }
+
+    .subscription-name {
+        font-size: 1rem;
+    }
+
+    .anomaly-indicator {
+        font-size: 0.6875rem;
+        padding: 0.25rem 0.625rem;
+    }
+
+    table {
+        font-size: 0.8125rem;
+    }
+
+    th {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    td {
+        padding: 0.75rem;
+    }
+
+    .test-success,
+    .test-error {
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .config-status {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .success-message {
+        padding: 1.5rem;
+    }
+
+    .success-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .success-message h3 {
+        font-size: 1.125rem;
+    }
+
+    #summary-badge {
+        padding: 1rem;
+    }
+
+    #summary-badge .badge {
+        font-size: 0.875rem;
+        padding: 0.75rem 1.25rem;
+    }
+
+    /* Agent mobile styles */
+    .agent-container {
+        gap: 1rem;
+        min-height: 450px;
+    }
+
+    .chat-area {
+        height: 65vh;
+        min-height: 450px;
+    }
+
+    .chat-header {
+        padding: 1rem;
+    }
+
+    .chat-header h3 {
+        font-size: 0.9375rem;
+    }
+
+    .chat-header p {
+        font-size: 0.75rem;
+    }
+
+    #agent-messages {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .chat-input-area {
+        padding: 0.875rem 1rem;
+    }
+
+    #agent-message-input {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    #agent-send-btn {
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        height: 40px;
+    }
+
+    #agent-send-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .message {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        max-width: 92%;
+    }
+
+    .message-assistant {
+        max-width: 92%;
+    }
+
+    .message-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .tool-call {
+        padding: 0.625rem;
+    }
+
+    .tool-call-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .tool-call-text strong {
+        font-size: 0.75rem;
+    }
+
+    .tool-call-params {
+        font-size: 0.6875rem;
+    }
+
+    .welcome-message {
+        padding: 2rem 1rem;
+    }
+
+    .welcome-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .welcome-message h3 {
+        font-size: 1.125rem;
+    }
+
+    .welcome-message p {
+        font-size: 0.875rem;
+    }
+
+    .example-questions li {
+        padding: 0.75rem 1rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 360px) {
+    header h1 {
+        font-size: 1.25rem;
+    }
+
+    .subtitle {
+        font-size: 0.75rem;
+    }
+
+    .tab {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+
+    .card h2 {
+        font-size: 1.125rem;
+    }
+
+    .btn {
+        padding: 0.5625rem 1rem;
+        font-size: 0.8125rem;
+    }
+
+    .stat-box .value {
+        font-size: 1.25rem;
+    }
+
+    table {
+        font-size: 0.75rem;
+    }
+
+    th, td {
+        padding: 0.5rem;
+    }
+
+    /* Agent small mobile */
+    .chat-area {
+        height: 60vh;
+        min-height: 400px;
+    }
+
+    .message {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    header {
+        padding: 1rem 0 1.5rem 0;
+    }
+
+    .tabs {
+        margin-top: -1rem;
+    }
+
+    .container > .tab-content {
+        padding: 1rem;
+    }
+
+    .card > div[style*="padding"] {
+        padding: 1rem !important;
+    }
+
+    /* Agent landscape */
+    .agent-container {
+        height: calc(100vh - 200px);
+        min-height: 400px;
+    }
+
+    .chat-area {
+        height: calc(100vh - 200px);
+    }
+}
+
+/* High Resolution Displays */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .card h2 {
+        font-size: 1.625rem;
+    }
+
+    .stat-box .value {
+        font-size: 2rem;
+    }
+
+    /* Agent high res */
+    .agent-container {
+        grid-template-columns: 320px 1fr;
+    }
+
+    .conversation-sidebar {
+        font-size: 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+    }
+
+    header {
+        background: white;
+        color: black;
+        box-shadow: none;
+    }
+
+    .tabs,
+    .btn,
+    .button-group,
+    .conversation-sidebar,
+    .chat-input-area {
+        display: none;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+
+    .tab-content {
+        display: block !important;
+    }
+
+    table {
+        border: 1px solid #ccc;
+    }
+
+    .badge,
+    .anomaly-indicator {
+        border: 1px solid currentColor;
+    }
+
+    /* Agent print */
+    .agent-container {
+        display: block;
+    }
+
+    .chat-area {
+        height: auto;
+        border: 1px solid #ccc;
+    }
+
+    .message {
+        page-break-inside: avoid;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Dark Mode Support (optional future enhancement) */
+@media (prefers-color-scheme: dark) {
+    /* Keep light theme for now, but structure is ready for dark mode */
+}

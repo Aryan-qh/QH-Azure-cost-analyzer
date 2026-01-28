@@ -1,0 +1,250 @@
+/* ============================================================================
+   CSS VARIABLES & BASE STYLES - ENTERPRISE EDITION
+   ============================================================================ */
+
+:root {
+    /* Primary Brand Colors - More sophisticated blue palette */
+    --primary: #0066cc;
+    --primary-dark: #004c99;
+    --primary-light: #e6f2ff;
+    --primary-hover: #0052a3;
+    
+    /* Success Colors */
+    --success: #0ea972;
+    --success-light: #e8f7f2;
+    --success-dark: #0a7d54;
+    
+    /* Danger Colors */
+    --danger: #e5484d;
+    --danger-light: #feecee;
+    --danger-dark: #cd2b31;
+    
+    /* Warning Colors */
+    --warning: #f59e0b;
+    --warning-light: #fef3e2;
+    --warning-dark: #d97706;
+    
+    /* Neutral Palette - More refined grays */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fb;
+    --bg-tertiary: #f1f3f6;
+    --bg-hover: #f4f6f9;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --border-dark: #cbd5e1;
+    --border-focus: #0066cc;
+    
+    /* Enhanced Shadows - More depth */
+    --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+    --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.08);
+    --shadow-md: 0 8px 16px -4px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 16px 24px -8px rgba(15, 23, 42, 0.12), 0 8px 12px -4px rgba(15, 23, 42, 0.08);
+    --shadow-xl: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+    
+    /* Border Radius */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    
+    /* Spacing System */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+    
+    /* Typography */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================================
+   RESET & BASE
+   ============================================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: linear-gradient(135deg, #f8f9fb 0%, #e8edf5 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-size: 15px;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* ============================================================================
+   HEADER - Premium Design
+   ============================================================================ */
+
+header {
+    background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+    color: white;
+    padding: 2rem 0 2.5rem 0;
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+    position: relative;
+}
+
+header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+header .container {
+    padding: 0 2rem;
+}
+
+header h1 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.025em;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+header h1::before {
+    content: '';
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    font-size: 0.9375rem;
+    opacity: 0.92;
+    font-weight: 400;
+    margin-top: 0.5rem;
+    margin-left: 60px;
+    letter-spacing: 0.01em;
+}
+
+/* ============================================================================
+   ANIMATIONS - Smooth & Professional
+   ============================================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { 
+        transform: rotate(360deg); 
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-warning { color: var(--warning); }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+
+/* Selection styling */
+::selection {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
