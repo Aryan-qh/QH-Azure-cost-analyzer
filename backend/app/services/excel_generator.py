@@ -4,19 +4,24 @@ Excel Report Generator Service
 CHANGES MADE:
 1. REMOVED: Line chart generation from summary sheet (_add_summary_chart method deleted)
 2. REMOVED: Chart import (LineChart, Reference) - no longer needed
-3. REMOVED: Call to _add_summary_chart in _create_summary_sheet
+3. REMOVED: Call to _add_summary_sheet in _create_summary_sheet
 4. UNCHANGED: All other functionality remains the same
+5. CHANGE: Transposed subscription sheets - services in rows, dates in columns
+6. NEW CHANGE: Removed ALL totals from the Excel file (Total column, Total row, Grand Total)
+7. **LATEST CHANGE**: Removed Period Total and Daily Average rows from Summary sheet
 
 PURPOSE:
 Generate detailed Excel reports with:
 1. Resource-level cost breakdown by subscription (now shows ALL services individually)
 2. Anomaly detection results
 3. Day-over-day comparisons with percentage changes
+4. NO TOTALS anywhere in the workbook
+5. Clean Summary sheet with just daily costs (no statistics rows)
 
 LOGIC:
 - Create multi-sheet workbook:
-  * "Summary" sheet: High-level totals (NO CHART)
-  * One sheet per subscription: Daily costs by service (all services shown)
+  * "Summary" sheet: High-level by subscription (NO TOTAL COLUMN, NO STATISTICS)
+  * One sheet per subscription: Services as rows, dates as columns (NO TOTALS)
   * "Anomalies" sheet: All detected anomalies
 - Use Excel formulas for calculations (not hardcoded values)
 - Apply professional formatting with color coding
@@ -43,7 +48,7 @@ class ExcelGeneratorService:
     COLOR_INPUT = '0000FF'    # Blue text for inputs
     COLOR_FORMULA = '000000'  # Black text for formulas
     COLOR_ANOMALY = 'FFC7CE'  # Light red background for anomalies
-    COLOR_TOTAL = 'FFFFCC'    # Light yellow for totals
+    COLOR_TOTAL = 'FFFFCC'    # Light yellow for totals (kept for anomaly sheet)
     
     def __init__(self, output_directory: str):
         self.output_directory = output_directory
@@ -92,8 +97,8 @@ class ExcelGeneratorService:
         Generate comprehensive Excel report with multiple sheets.
         
         STRUCTURE:
-        1. Summary sheet: Subscription totals and trends (NO CHART)
-        2. Per-subscription sheets: Daily breakdown by service (ALL services shown)
+        1. Summary sheet: Subscription costs (NO TOTAL COLUMN, NO STATISTICS)
+        2. Per-subscription sheets: Services in rows, dates in columns (NO TOTALS)
         3. Anomalies sheet: All detected anomalies
         
         Args:
@@ -133,16 +138,16 @@ class ExcelGeneratorService:
     
     def _create_summary_sheet(self, wb: Workbook, all_data: Dict, dates: List[datetime]):
         """
-        Create summary sheet with subscription totals.
+        Create summary sheet with subscription costs.
         
-        CHANGE: Removed line chart generation - now only shows the data table.
+        **LATEST CHANGE**: Removed Period Total and Daily Average rows - now only shows daily data
         
         LAYOUT:
         - Row 1: Title
         - Row 2: Blank
-        - Row 3: Headers (Date, Subscription1, Subscription2, ..., Total)
-        - Row 4+: Daily totals
-        - Bottom: Summary statistics (Period Total, Daily Average)
+        - Row 3: Headers (Date, Subscription1, Subscription2, ...)
+        - Row 4+: Daily costs ONLY
+        - NO STATISTICS ROWS (Period Total and Daily Average removed)
         """
         sheet = wb.create_sheet('Summary', 0)
         
@@ -164,13 +169,9 @@ class ExcelGeneratorService:
             self._apply_header_style(cell)
             col += 1
         
-        # Total column
-        total_col = col
-        cell = sheet.cell(row=row, column=total_col)
-        cell.value = 'Total'
-        self._apply_header_style(cell)
+        last_col = col - 1
         
-        # Data rows
+        # Data rows (daily costs only)
         for day_idx, date in enumerate(dates):
             row = 4 + day_idx
             
@@ -178,12 +179,11 @@ class ExcelGeneratorService:
             sheet[f'A{row}'] = date.strftime('%m/%d/%Y')
             sheet[f'A{row}'].alignment = Alignment(horizontal='left')
             
-            # Subscription totals
+            # Subscription costs
             col = 2
             for sub_name in subscription_names:
                 data = all_data[sub_name]
                 # Extract total from cost_table for this day
-                # Note: cost_table is ordered from oldest to newest
                 if day_idx < len(data['cost_table']):
                     cost_row = data['cost_table'][day_idx]
                     # Last value in row is total
@@ -193,69 +193,14 @@ class ExcelGeneratorService:
                     self._format_currency(cell)
                     self._apply_data_style(cell, is_formula=False)
                 col += 1
-            
-            # Total formula (sum across subscriptions)
-            cell = sheet.cell(row=row, column=total_col)
-            start_col = get_column_letter(2)
-            end_col = get_column_letter(total_col - 1)
-            cell.value = f'=SUM({start_col}{row}:{end_col}{row})'
-            self._format_currency(cell)
-            self._apply_data_style(cell, is_formula=True)
-            cell.fill = PatternFill(start_color=self.COLOR_TOTAL, 
-                                   end_color=self.COLOR_TOTAL, fill_type='solid')
         
-        # Summary statistics
-        stats_row = row + 2
-        sheet[f'A{stats_row}'] = 'Period Total:'
-        sheet[f'A{stats_row}'].font = Font(bold=True)
-        
-        col = 2
-        for _ in subscription_names:
-            cell = sheet.cell(row=stats_row, column=col)
-            cell.value = f'=SUM({get_column_letter(col)}4:{get_column_letter(col)}{row})'
-            self._format_currency(cell)
-            self._apply_data_style(cell, is_formula=True)
-            cell.font = Font(bold=True, color=self.COLOR_FORMULA)
-            col += 1
-        
-        # Grand total
-        cell = sheet.cell(row=stats_row, column=total_col)
-        cell.value = f'=SUM({get_column_letter(2)}{stats_row}:{get_column_letter(total_col-1)}{stats_row})'
-        self._format_currency(cell)
-        self._apply_data_style(cell, is_formula=True)
-        cell.font = Font(bold=True, color=self.COLOR_FORMULA)
-        cell.fill = PatternFill(start_color=self.COLOR_TOTAL, 
-                               end_color=self.COLOR_TOTAL, fill_type='solid')
-        
-        # Daily average
-        avg_row = stats_row + 1
-        sheet[f'A{avg_row}'] = 'Daily Average:'
-        sheet[f'A{avg_row}'].font = Font(bold=True)
-        
-        col = 2
-        for _ in subscription_names:
-            cell = sheet.cell(row=avg_row, column=col)
-            cell.value = f'={get_column_letter(col)}{stats_row}/{len(dates)}'
-            self._format_currency(cell)
-            self._apply_data_style(cell, is_formula=True)
-            cell.font = Font(bold=True, color=self.COLOR_FORMULA)
-            col += 1
-        
-        # Grand average
-        cell = sheet.cell(row=avg_row, column=total_col)
-        cell.value = f'={get_column_letter(total_col)}{stats_row}/{len(dates)}'
-        self._format_currency(cell)
-        self._apply_data_style(cell, is_formula=True)
-        cell.font = Font(bold=True, color=self.COLOR_FORMULA)
-        cell.fill = PatternFill(start_color=self.COLOR_TOTAL, 
-                               end_color=self.COLOR_TOTAL, fill_type='solid')
+        # **REMOVED**: Period Total and Daily Average rows (previously rows stats_row and avg_row)
+        # The summary sheet now ends immediately after the last daily cost row
         
         # Set column widths
         sheet.column_dimensions['A'].width = 12
-        for col in range(2, total_col + 1):
+        for col in range(2, last_col + 1):
             sheet.column_dimensions[get_column_letter(col)].width = 15
-        
-        # REMOVED: Line chart generation (_add_summary_chart call removed)
     
     def _create_subscription_sheet(
         self, 
@@ -265,14 +210,29 @@ class ExcelGeneratorService:
         dates: List[datetime]
     ):
         """
-        Create detailed sheet for a subscription.
+        Create detailed sheet for a subscription - TRANSPOSED LAYOUT WITHOUT TOTALS.
         
-        UNCHANGED: This method works the same, but now displays ALL services
-        instead of grouped categories because cost_processor.py was updated.
+        **CHANGES**: 
+        - Transposed: Services in rows, dates in columns
+        - Removed: Total column and Total row
         
         LAYOUT:
-        - Section 1: Daily costs by service (now shows ALL Azure services)
-        - Section 2: Day-over-day percentage changes
+        - Section 1: Services as rows, dates as columns for costs (NO TOTALS)
+        - Section 2: Services as rows, dates as columns for percentage changes (NO TOTALS)
+        
+        LOGIC:
+        The data comes from cost_table which is structured as:
+        [
+            ['date1', 'service1_cost', 'service2_cost', ..., 'total'],
+            ['date2', 'service1_cost', 'service2_cost', ..., 'total'],
+            ...
+        ]
+        
+        We transpose this so that:
+        - Row 1: Service names (headers)
+        - Column 1: Date values
+        - Cells: Costs at intersection
+        - NO total row or column
         """
         sheet = wb.create_sheet(sub_name[:31])  # Excel sheet name limit
         
@@ -281,66 +241,96 @@ class ExcelGeneratorService:
         sheet['A1'].font = Font(bold=True, size=12)
         
         # Section 1: Daily Costs
-        sheet['A3'] = 'Daily Costs by Service'
+        sheet['A3'] = 'Daily Costs by Service (Services in Rows)'
         sheet['A3'].font = Font(bold=True, size=11)
         
-        # Headers from data
-        headers = data['headers']
+        # Extract headers and data
+        headers = data['headers']  # ['Date', 'Service1', 'Service2', ..., 'Total']
+        cost_table = data['cost_table']  # List of rows, each row is [date, cost1, cost2, ..., total]
+        
+        # Create transposed headers: First column is "Service", then dates
         row = 4
-        for col_idx, header in enumerate(headers, start=1):
+        sheet.cell(row=row, column=1).value = 'Service'
+        self._apply_header_style(sheet.cell(row=row, column=1))
+        
+        # Add date headers across columns
+        for col_idx, cost_row in enumerate(cost_table, start=2):
             cell = sheet.cell(row=row, column=col_idx)
-            cell.value = header
+            cell.value = cost_row[0]  # Date value
             self._apply_header_style(cell)
         
-        # Cost data
-        for day_idx, cost_row in enumerate(data['cost_table']):
-            row = 5 + day_idx
-            for col_idx, value in enumerate(cost_row, start=1):
-                cell = sheet.cell(row=row, column=col_idx)
-                if col_idx == 1:  # Date column
-                    cell.value = value
-                    cell.alignment = Alignment(horizontal='left')
-                else:
-                    # Remove $ and convert to number
-                    cell.value = float(value.replace('$', '').replace(',', ''))
-                    self._format_currency(cell)
-                    self._apply_data_style(cell, is_formula=False)
+        last_col = len(cost_table) + 1
         
-        # Section 2: Percentage Changes
-        percent_start_row = row + 3
-        sheet[f'A{percent_start_row}'] = 'Day-over-Day Percentage Changes'
+        # Add service rows with costs
+        # Skip first header (Date) and last header (Total) - we'll exclude Total
+        service_headers = headers[1:-1]  # All services, excluding 'Date' and 'Total'
+        
+        for service_idx, service_name in enumerate(service_headers):
+            row = 5 + service_idx
+            
+            # Service name in first column
+            cell = sheet.cell(row=row, column=1)
+            cell.value = service_name
+            cell.alignment = Alignment(horizontal='left', vertical='center')
+            cell.font = Font(bold=True)
+            
+            # Add costs for each date
+            for col_idx, cost_row in enumerate(cost_table, start=2):
+                cell = sheet.cell(row=row, column=col_idx)
+                # service_idx + 1 because cost_row[0] is date, cost_row[1] is first service
+                value = cost_row[service_idx + 1]
+                cell.value = float(value.replace('$', '').replace(',', ''))
+                self._format_currency(cell)
+                self._apply_data_style(cell, is_formula=False)
+        
+        last_row = 5 + len(service_headers) - 1
+        
+        # Section 2: Percentage Changes (also transposed, also without totals)
+        percent_start_row = last_row + 3
+        sheet[f'A{percent_start_row}'] = 'Day-over-Day Percentage Changes (Services in Rows)'
         sheet[f'A{percent_start_row}'].font = Font(bold=True, size=11)
         
-        # Headers
+        # Headers for percentage section
         row = percent_start_row + 1
-        for col_idx, header in enumerate(headers, start=1):
+        sheet.cell(row=row, column=1).value = 'Service'
+        self._apply_header_style(sheet.cell(row=row, column=1))
+        
+        # Add date headers (skip first date since percentage is day-over-day)
+        percent_table = data['percent_table']
+        for col_idx, percent_row in enumerate(percent_table, start=2):
             cell = sheet.cell(row=row, column=col_idx)
-            cell.value = header
+            cell.value = percent_row[0]  # Date value
             self._apply_header_style(cell)
         
-        # Percentage data
-        for day_idx, percent_row in enumerate(data['percent_table']):
-            row = percent_start_row + 2 + day_idx
-            for col_idx, value in enumerate(percent_row, start=1):
+        # Add service rows with percentage changes
+        for service_idx, service_name in enumerate(service_headers):
+            row = percent_start_row + 2 + service_idx
+            
+            # Service name
+            cell = sheet.cell(row=row, column=1)
+            cell.value = service_name
+            cell.alignment = Alignment(horizontal='left', vertical='center')
+            cell.font = Font(bold=True)
+            
+            # Add percentages for each date
+            for col_idx, percent_row in enumerate(percent_table, start=2):
                 cell = sheet.cell(row=row, column=col_idx)
-                if col_idx == 1:  # Date column
-                    cell.value = value
-                    cell.alignment = Alignment(horizontal='left')
-                else:
-                    # Remove % and convert to decimal
-                    percent_val = float(value.replace('%', '').replace('+', '')) / 100
-                    cell.value = percent_val
-                    self._format_percentage(cell)
-                    self._apply_data_style(cell, is_formula=False)
-                    
-                    # Highlight significant changes (>50% or <-50%)
-                    if abs(percent_val) > 0.5:
-                        cell.fill = PatternFill(start_color='FFEB9C', 
-                                               end_color='FFEB9C', fill_type='solid')
+                # service_idx + 1 because percent_row[0] is date, percent_row[1] is first service
+                value = percent_row[service_idx + 1]
+                percent_val = float(value.replace('%', '').replace('+', '')) / 100
+                cell.value = percent_val
+                self._format_percentage(cell)
+                self._apply_data_style(cell, is_formula=False)
+                
+                # Highlight significant changes (>50% or <-50%)
+                if abs(percent_val) > 0.5:
+                    cell.fill = PatternFill(start_color='FFEB9C', 
+                                           end_color='FFEB9C', fill_type='solid')
         
         # Set column widths
-        for col_idx in range(1, len(headers) + 1):
-            sheet.column_dimensions[get_column_letter(col_idx)].width = 14
+        sheet.column_dimensions['A'].width = 25  # Service names
+        for col_idx in range(2, last_col + 1):
+            sheet.column_dimensions[get_column_letter(col_idx)].width = 12
     
     def _create_anomalies_sheet(self, wb: Workbook, anomaly_data: List[Dict]):
         """

@@ -5,15 +5,16 @@ CHANGE: Refactored to generate simple summary reports
 - Removed detailed resource breakdown (moved to Excel)
 - Removed anomaly detection section (moved to Excel)
 - Now creates email-friendly summaries with only subscription totals
+- NEW CHANGE: Removed Total column from the table (only individual subscriptions shown)
 
 PURPOSE:
 Generate simple Word documents showing:
-1. Daily total costs per subscription
-2. Period summary with grand total
+1. Daily total costs per subscription (NO TOTAL COLUMN)
+2. Period summary with individual subscription totals only
 3. Reference to Excel file for details
 
 Logic:
-- Single table with Date | Subscription1 | Subscription2 | ... | Total
+- Single table with Date | Subscription1 | Subscription2 | ...
 - Clean, concise format suitable for email
 - Detailed analysis moved to Excel file
 """
@@ -67,12 +68,16 @@ class DocumentGeneratorService:
         num_days: int
     ) -> str:
         """
-        Generate a SIMPLIFIED Word document with only subscription totals.
+        Generate a SIMPLIFIED Word document with only subscription costs (no totals).
+        
+        **NEW CHANGE**: Removed Total column from table and grand total from summary
         
         CHANGE: Removed detailed resource breakdown and anomalies
-        - Now shows only total cost per subscription per day
+        - Now shows only cost per subscription per day
         - Detailed breakdown moved to Excel file
         - Designed for email-friendly summary
+        - NO TOTAL COLUMN in the table
+        - NO GRAND TOTAL in the period summary
         
         Args:
             all_data: Dictionary with subscription names as keys
@@ -111,15 +116,15 @@ class DocumentGeneratorService:
             f"For detailed resource breakdown and anomaly detection, please refer to the accompanying Excel file.\n"
         )
         
-        # Create single summary table with all subscriptions
+        # Create single summary table with all subscriptions (NO TOTAL COLUMN)
         # Sort subscription names alphabetically for consistent ordering
         sorted_subscriptions = sorted(all_data.keys())
         
-        # Build table: Date | Subscription1 | Subscription2 | ... | Total
-        table_headers = ['Date'] + [sub.replace('_', ' ').title() for sub in sorted_subscriptions] + ['Total']
+        # Build table: Date | Subscription1 | Subscription2 | ... (NO TOTAL)
+        table_headers = ['Date'] + [sub.replace('_', ' ').title() for sub in sorted_subscriptions]
         table_data = []
         
-        # Extract totals for each day
+        # Extract costs for each day
         for day_idx in range(num_days):
             row = []
             
@@ -132,7 +137,6 @@ class DocumentGeneratorService:
                 continue
             
             # Each subscription's total for this day
-            day_total = 0.0
             for sub_name in sorted_subscriptions:
                 if sub_name in all_data and all_data[sub_name]:
                     data = all_data[sub_name]
@@ -141,21 +145,18 @@ class DocumentGeneratorService:
                         # Last value in cost_table is the total
                         total_str = cost_row[-1]
                         row.append(total_str)
-                        # Add to day total (remove $ and commas)
-                        day_total += float(total_str.replace('$', '').replace(',', ''))
                     else:
                         row.append('$0.00')
                 else:
                     row.append('$0.00')
             
-            # Add day total
-            row.append(f'${day_total:,.2f}')
+            # NO LONGER ADDING DAY TOTAL - removed this section
             table_data.append(row)
         
         # Add the table
-        self.add_table_to_doc(doc, table_data, table_headers, "Daily Total Costs by Subscription")
+        self.add_table_to_doc(doc, table_data, table_headers, "Daily Costs by Subscription")
         
-        # Add period summary
+        # Add period summary (WITHOUT GRAND TOTAL)
         doc.add_paragraph()
         summary_para = doc.add_paragraph()
         summary_para.add_run("Period Summary:\n").bold = True
@@ -171,18 +172,9 @@ class DocumentGeneratorService:
                     sub_total += float(total_str.replace('$', '').replace(',', ''))
                 
                 display_name = sub_name.replace('_', ' ').title()
-                summary_para.add_run(f"â€¢ {display_name}: ${sub_total:,.2f}\n")
+                summary_para.add_run(f"• {display_name}: ${sub_total:,.2f}\n")
         
-        # Grand total
-        grand_total = 0.0
-        for sub_name in sorted_subscriptions:
-            if sub_name in all_data and all_data[sub_name]:
-                data = all_data[sub_name]
-                for cost_row in data['cost_table']:
-                    total_str = cost_row[-1]
-                    grand_total += float(total_str.replace('$', '').replace(',', ''))
-        
-        summary_para.add_run(f"\nGrand Total: ${grand_total:,.2f}").bold = True
+        # NO LONGER ADDING GRAND TOTAL - removed this section
         
         # Add closing
         doc.add_paragraph("\nFor detailed analysis, please see the attached Excel file.")
